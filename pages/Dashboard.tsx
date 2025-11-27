@@ -1,13 +1,13 @@
 import React from 'react';
-import { DEMO_TRIPS } from '../constants';
 import { MapPin, Calendar, ArrowRight } from 'lucide-react';
-import { AppRoute } from '../types';
+import { AppRoute, Trip } from '../types';
 
 interface DashboardProps {
   onNavigate: (route: AppRoute) => void;
+  trips: Trip[];
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
+const Dashboard: React.FC<DashboardProps> = ({ onNavigate, trips }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="flex justify-between items-center mb-8">
@@ -37,7 +37,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {DEMO_TRIPS.map((trip) => (
+        {trips.length > 0 ? trips.map((trip) => (
           <div key={trip.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
             <div className="h-48 overflow-hidden relative">
               <img src={trip.imageUrl} alt={trip.destination} className="w-full h-full object-cover" />
@@ -53,20 +53,25 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               
               <div className="flex items-center text-sm text-gray-600 mb-4 bg-gray-50 p-2 rounded-lg">
                 <Calendar size={16} className="mr-2 text-primary" />
-                {trip.startDate} - {trip.endDate} ({trip.durationDays} Tage)
+                {trip.startDate && trip.endDate ? `${trip.startDate} - ${trip.endDate}` : 'Datum noch offen'}
+                {trip.durationDays ? ` (${trip.durationDays} Tage)` : ''}
               </div>
 
               <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                <span className="font-bold text-lg">{trip.totalPrice} CHF</span>
+                <span className="font-bold text-lg">{trip.totalPrice ? `${trip.totalPrice} CHF` : trip.priceEstimate}</span>
                 <button className="text-primary font-medium text-sm flex items-center hover:underline">
                   Bearbeiten <ArrowRight size={16} className="ml-1" />
                 </button>
               </div>
             </div>
           </div>
-        ))}
+        )) : (
+          <div className="col-span-full py-12 text-center text-gray-500">
+            Noch keine Reisen geplant. Starte jetzt!
+          </div>
+        )}
         
-        {/* Empty State placeholder if needed */}
+        {/* Add New Card */}
         <div className="bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-8 text-center hover:bg-gray-100 transition cursor-pointer" onClick={() => onNavigate(AppRoute.CHAT)}>
           <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 text-gray-400 shadow-sm">
             +

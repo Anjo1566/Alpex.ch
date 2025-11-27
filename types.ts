@@ -17,6 +17,7 @@ export interface Trip {
   totalPrice: number;
   highlights: string[];
   status: 'draft' | 'booked' | 'past';
+  priceEstimate?: string; // Compatibility with proposal
 }
 
 export interface ChatMessage {

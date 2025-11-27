@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import { TripProposal, AppRoute } from '../types';
-import { ArrowLeft, Calendar, User, Plane, Hotel, Map, Clock, Check, Share2, Heart } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Plane, Hotel, Map, Clock, Check, Share2, Heart, Camera, Coffee, Mountain, Music } from 'lucide-react';
 
 interface TripDetailsProps {
   trip: TripProposal;
   onBack: () => void;
+  onSave: (trip: TripProposal) => void;
 }
 
-const TripDetails: React.FC<TripDetailsProps> = ({ trip, onBack }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'flights' | 'hotels' | 'plan'>('overview');
+const TripDetails: React.FC<TripDetailsProps> = ({ trip, onBack, onSave }) => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'flights' | 'hotels' | 'activities' | 'plan'>('overview');
+  const [isSaved, setIsSaved] = useState(false);
+
+  const handleSave = () => {
+    onSave(trip);
+    setIsSaved(true);
+  };
 
   return (
     <div className="bg-background min-h-screen pb-20">
@@ -42,7 +49,7 @@ const TripDetails: React.FC<TripDetailsProps> = ({ trip, onBack }) => {
       <div className="bg-white border-b sticky top-16 z-20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 overflow-x-auto">
           <div className="flex space-x-8">
-            {['overview', 'flights', 'hotels', 'plan'].map((tab) => (
+            {['overview', 'flights', 'hotels', 'activities', 'plan'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -55,6 +62,7 @@ const TripDetails: React.FC<TripDetailsProps> = ({ trip, onBack }) => {
                 {tab === 'overview' && 'Übersicht'}
                 {tab === 'flights' && 'Flüge'}
                 {tab === 'hotels' && 'Hotels'}
+                {tab === 'activities' && 'Aktivitäten'}
                 {tab === 'plan' && 'Tagesplan'}
               </button>
             ))}
@@ -122,6 +130,43 @@ const TripDetails: React.FC<TripDetailsProps> = ({ trip, onBack }) => {
              </div>
           )}
 
+          {activeTab === 'activities' && (
+             <div className="space-y-4">
+               <div className="flex items-center justify-between mb-2">
+                 <h3 className="font-bold text-lg">Beliebte Aktivitäten</h3>
+                 <div className="text-sm text-gray-500">Powered by Viator</div>
+               </div>
+               
+               {[
+                 { title: 'Historische Stadtführung', icon: <Camera size={20} />, price: 'ab 25 CHF', rating: '4.8' },
+                 { title: 'Kulinarische Tour & Tasting', icon: <Coffee size={20} />, price: 'ab 65 CHF', rating: '4.9' },
+                 { title: 'Tagesausflug in die Natur', icon: <Mountain size={20} />, price: 'ab 80 CHF', rating: '4.7' },
+                 { title: 'Abendliche Bootstour', icon: <Music size={20} />, price: 'ab 45 CHF', rating: '4.5' },
+               ].map((activity, idx) => (
+                 <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-primary flex-shrink-0">
+                        {activity.icon}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-dark">{activity.title}</h4>
+                        <div className="flex items-center text-sm text-gray-500 mt-1">
+                           <span className="text-yellow-500 mr-1">★</span> {activity.rating} • 2-3 Stunden
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t sm:border-t-0 pt-3 sm:pt-0">
+                       <span className="font-bold text-dark">{activity.price}</span>
+                       <button className="px-4 py-2 bg-primary/10 text-primary font-bold rounded-lg text-sm hover:bg-primary/20 transition">Hinzufügen</button>
+                    </div>
+                 </div>
+               ))}
+               <div className="text-center mt-6">
+                 <button className="text-primary font-medium hover:underline">Mehr Aktivitäten auf Viator ansehen →</button>
+               </div>
+             </div>
+          )}
+
           {activeTab === 'plan' && (
             <div className="space-y-6">
                <div className="flex items-start">
@@ -179,8 +224,13 @@ const TripDetails: React.FC<TripDetailsProps> = ({ trip, onBack }) => {
                  Reise buchen
                </button>
                <div className="flex gap-2">
-                 <button className="flex-1 border border-gray-200 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center">
-                   <Heart size={18} className="mr-2" /> Merken
+                 <button 
+                   onClick={handleSave}
+                   disabled={isSaved}
+                   className={`flex-1 border border-gray-200 py-2 rounded-lg font-medium hover:bg-gray-50 flex items-center justify-center transition ${isSaved ? 'text-green-600 bg-green-50 border-green-200' : 'text-gray-600'}`}
+                 >
+                   {isSaved ? <Check size={18} className="mr-2" /> : <Heart size={18} className="mr-2" />} 
+                   {isSaved ? 'Gemerkt' : 'Merken'}
                  </button>
                  <button className="flex-1 border border-gray-200 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center">
                    <Share2 size={18} className="mr-2" /> Teilen
